@@ -1,0 +1,60 @@
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        <title>Trabajo02</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    </h:head>
+    <h:body>
+
+        <h:form>  
+            <p:menubar>  
+                <p:menuitem value="Download" url="../faces/Download.xhtml" />   
+                <p:menuitem value="Upload" url="../faces/Upload.xhtml" />  
+                <p:submenu label="DragDrop">
+                    <p:menuitem value="Draggable" url="../faces/Draggable.xhtml" />
+                    <p:menuitem value="DataGrid" url="../faces/DataGrid.xhtml" />
+                    <p:menuitem value="DataTable" url="../faces/DataTable.xhtml" />
+                    <p:menuitem value="Custom" url="../faces/Custom.xhtml" />
+                </p:submenu>
+
+            </p:menubar>
+        </h:form>
+        <center>
+            <h1>Componente Download</h1>
+        </center>
+
+        <script type="text/javascript">
+            //<![CDATA[
+            function start() {
+                PF('statusDialog').show();
+            }
+
+            function stop() {
+                PF('statusDialog').hide();
+            }
+            //]]>
+        </script>
+
+        <div class="card">
+            <p:dialog modal="true" widgetVar="statusDialog" header="Status" draggable="false" closable="false"
+                      resizable="false">
+                <i class="pi pi-spinner pi-spin" style="font-size:3rem"></i>
+            </p:dialog>
+
+            <h:form>
+                <p:commandButton value="Descargar" ajax="false" onclick="PrimeFaces.monitorDownload(start, stop);"
+                                 icon="pi pi-arrow-down" styleClass="p-mr-2">
+                    <p:fileDownload value="#{download.file}"/>
+                </p:commandButton>
+
+                <p:commandButton value="Ajax Download" icon="pi pi-arrow-down" styleClass="ui-button-outlined">
+                    <p:fileDownload value="#{download.file}"/>
+                </p:commandButton>
+            </h:form>
+        </div>
+    </h:body>
+</html>

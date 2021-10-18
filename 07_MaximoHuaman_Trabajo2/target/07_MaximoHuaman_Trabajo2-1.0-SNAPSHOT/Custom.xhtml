@@ -1,0 +1,125 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:fn="http://java.sun.com/jsp/jstl/functions">
+    <h:head>
+        <title>Trabajo02</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    </h:head>
+    <h:body>
+
+        <h:form>  
+            <p:menubar>  
+                <p:menuitem value="Download y Upload" url="./faces/Download and Upload.xhtml" />   
+                <p:submenu label="DragDrop">
+                    <p:menuitem value="Draggable" url="./faces/Draggable.xhtml" />
+                    <p:menuitem value="DataGrid" url="./faces/DataGrid.xhtml" />
+                    <p:menuitem value="DataTable" url="./faces/DataTable.xhtml" />
+                    <p:menuitem value="Custom" url="./faces/Custom.xhtml" />
+                </p:submenu>
+
+            </p:menubar>
+        </h:form>
+        <center>
+            <h1>Componente DataTable</h1>
+        </center>
+
+        <style type="text/css">
+            .active-drop {
+                background-color: var(--primary-color);
+            }
+
+            .highlight-drop {
+                background-color: var(--primary-color);
+            }
+        </style>
+        <script type="text/javascript">
+            function initDND() {
+                $('.ui-treenode-leaf').draggable({
+                    helper: 'clone',
+                    scope: 'treetotable',
+                    zIndex: ++PrimeFaces.zindex
+                });
+
+                $('.ui-datatable .droppoint').droppable({
+                    activeClass: 'active-drop',
+                    hoverClass: 'highlight-drop',
+                    tolerance: 'pointer',
+                    scope: 'treetotable',
+                    drop: function (event, ui) {
+                        var property = ui.draggable.find('.ui-treenode-label').text(),
+                                droppedColumnId = $(this).parents('th:first').attr('id'),
+                                dropPos = $(this).hasClass('dropleft') ? 0 : 1;
+
+                        treeToTable([
+                            {name: 'property', value: property}
+                            , {name: 'droppedColumnId', value: droppedColumnId}
+                            , {name: 'dropPos', value: dropPos}
+                        ]);
+                    }
+                });
+
+                $('.ui-datatable th').draggable({
+                    scope: 'tabletotree',
+                    helper: function () {
+                        var th = $(this);
+
+                        return th.clone().appendTo(document.body).css('width', th.width());
+                    }
+                });
+
+                $('.ui-tree').droppable({
+                    helper: 'clone',
+                    scope: 'tabletotree',
+                    activeClass: 'active-drop',
+                    hoverClass: 'highlight-drop',
+                    tolerance: 'touch',
+                    drop: function (event, ui) {
+                        tableToTree([
+                            {name: 'colIndex', value: ui.draggable.index()}
+                        ]);
+                    }
+                });
+            }
+
+            $(function () {
+                initDND();
+            });
+        </script>
+
+        <div class="card">
+            <h:form id="form">
+                <p:remoteCommand name="treeToTable" action="#{columnManagerView.treeToTable}" update="tree products"
+                                 oncomplete="initDND()"/>
+                <p:remoteCommand name="tableToTree" action="#{columnManagerView.tableToTree}" update="tree products"
+                                 oncomplete="initDND()"/>
+
+                <p:tree id="tree" value="#{columnManagerView.availableColumns}" var="column" style="margin-bottom:20px">
+                    <p:treeNode>
+                        <h:outputText value="#{column}"/>
+                    </p:treeNode>
+
+                    <p:treeNode type="column" icon="pi pi-ellipsis-v">
+                        <h:outputText value="#{column.property}"/>
+                    </p:treeNode>
+                </p:tree>
+
+                <p:dataTable id="products" var="product" value="#{columnManagerView.products}">
+                    <p:columns value="#{columnManagerView.columns}" var="column">
+                        <f:facet name="header">
+                            <h:outputText style="float:left;display:block;height:20px;width:10px;border:0 none;"
+                                          styleClass="droppoint dropleft"/>
+                            <h:outputText style="float:right;display:block;height:20px;width:10px;border:0 none;"
+                                          styleClass="droppoint dropright"/>
+                            <h:outputText value="#{column.header}"/>
+                        </f:facet>
+
+                        <h:outputText value="#{product[column.property]}"/>
+                    </p:columns>
+                </p:dataTable>
+            </h:form>
+        </div>
+    </h:body>
+</html>
